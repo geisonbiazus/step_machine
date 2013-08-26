@@ -1,4 +1,4 @@
-# QuoteMachine
+# StepMachine
 
 TODO: Write a gem description
 
@@ -6,7 +6,7 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem 'quote_machine'
+    gem 'step_machine'
 
 And then execute:
 
@@ -14,11 +14,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install quote_machine
+    $ gem install step_machine
 
 ## Usage
 
-TODO: Write usage instructions here
+Include the StepMachine in your class and add steps using the 'step' method and then execute steps with 'walk/walking' method
 
 ## Contributing
 
