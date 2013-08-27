@@ -77,6 +77,14 @@ describe "On step machine" do
 		queue.count.should equal 0
 	end
 
+	it "should execute one step of queu" do
+		add_step("Step 1", "params 1", proc { "block 1" })
+		add_step("Step 2", "params 2", proc { "block 2" })
+		walk
+		queue.count.should == 1
+		queue_completed.count.should == 1
+	end
+
 	it "should execute all steps of queue until first error" do
 		add_step("Step 1", "params 1", proc { "block" })
 		add_step("Step 2", "params 2", proc { raise "first error" })

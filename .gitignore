@@ -16,4 +16,4 @@ test/tmp
 test/version_tmp
 tmp
 *.sublime-project
-*.sublime-sublime-wokrspace
+*.sublime-wokrspace
