@@ -128,33 +128,67 @@ describe "StepMachine" do
 		end
 
 		it "should stop if walking and then try walk" do
-		  step("Step 1", "value 1") { "value 1" }
-		  step("Step 2", "value 2") { "value 2" }
-		  walking
-		  queue.count.should == 0
-		  walk.should == nil
+			step("Step 1", "value 1") { "value 1" }
+			step("Step 2", "value 2") { "value 2" }
+			walking
+			queue.count.should == 0
+			walk.should == nil
 		end
 
 		it "should stop walking if walk return nil value" do
-		  step("Step 1", "value 1") { "value 1" }
-		  queue << nil
-		  step("Step 3", "value 3") { "value 3" }
-		  queue.count.should == 3
-		  walking
-		  queue.count.should == 1
+			step("Step 1", "value 1") { "value 1" }
+			queue << nil
+			step("Step 3", "value 3") { "value 3" }
+			queue.count.should == 3
+			walking
+			queue.count.should == 1
 		end
 
 		it "should clean queue, queue_completed, queue_failed if call clear_queue" do
-		  queue << 1
-		  queue_failed << 1
-		  queue_completed << 1
-		  clear_queues
-		  queue.empty?.should be_true
-		  queue_failed.empty?.should be_true
-		  queue_completed.empty?.should be_true
+			queue << 1
+			queue_failed << 1
+			queue_completed << 1
+			clear_queues
+			queue.empty?.should be_true
+			queue_failed.empty?.should be_true
+			queue_completed.empty?.should be_true
 		end
+
+		it "should walk jsut epecified step" do
+			pending "Only test was implemented"
+			step("Step 1", "value 1") { "value 1" }
+			step("Step 2", "value 2") { "value 2" }
+			step("Step 3", "value 3") { "value 3" }
+			walk 2
+			queue_completed.first.name.should == "Step 2"		  
+		end
+
+		it "should walking queue from seccond position of queue to end" do
+			pending "Only test was implemented"
+			step("Step 1", "value 1") { "value 1" }
+			step("Step 2", "value 2") { "value 2" }
+			step("Step 3", "value 3") { "value 3" }
+			walking
+			queue_completed.should have(2).items
+		end
+
 	end
 
+	describe "When use goup of stpes" do
 
+		it "should add step with group and the group must be a symbol" do
+		  pending
+		end
+
+	  it "should walking only in specified group" do
+			pending "Only test was implemented"
+			step("Step 1", "value 1", :group => :goup_1) { "value 1" }
+			step("Step 2", "value 2", :group => :goup_1) { "value 2" }
+			step("Step 3", "value 3", :group => :goup_2) { "value 3" }
+			walking :group => :group_1
+			queue_completed.should have(2).items	    
+			queue.should have(1).items	    
+	  end
+	end
 
 end
