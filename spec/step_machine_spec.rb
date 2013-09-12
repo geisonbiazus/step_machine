@@ -154,8 +154,7 @@ describe "StepMachine" do
 			queue_completed.empty?.should be_true
 		end
 
-		it "should walk jsut epecified step" do
-			pending "Only test was implemented"
+		it "should walk just epecified step" do
 			step("Step 1", "value 1") { "value 1" }
 			step("Step 2", "value 2") { "value 2" }
 			step("Step 3", "value 3") { "value 3" }
@@ -163,12 +162,21 @@ describe "StepMachine" do
 			queue_completed.first.name.should == "Step 2"		  
 		end
 
-		it "should walking queue from seccond position of queue to end" do
-			pending "Only test was implemented"
+		it "should return nil if invalid epecified step" do
 			step("Step 1", "value 1") { "value 1" }
 			step("Step 2", "value 2") { "value 2" }
 			step("Step 3", "value 3") { "value 3" }
-			walking
+			walk(0).should == nil
+			queue_completed.should have(0).items
+			walk(4).should == nil
+			queue_completed.should have(0).items
+		end
+
+		it "should walking queue from seccond position of queue to end" do
+			step("Step 1", "value 1") { "value 1" }
+			step("Step 2", "value 2") { "value 2" }
+			step("Step 3", "value 3") { "value 3" }
+			walking :position => 2
 			queue_completed.should have(2).items
 		end
 

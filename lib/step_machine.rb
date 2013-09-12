@@ -45,8 +45,13 @@ module StepMachine
     end
 
     # Execute one step of queue
-    def walk
-      step = queue.delete(queue.first) || (return nil)      
+    def walk(position = nil)      
+      return nil if (position && (position-1 < 0 || position-1 > queue.count))
+      current_step = queue[position-1] if position
+      return nil if (position && !current_step)
+      current_step = queue.first unless position
+
+      step = queue.delete(current_step) || (return nil)      
       begin
         step.result = step.block.call(step.param)
         queue_completed << step
@@ -59,8 +64,9 @@ module StepMachine
     end
 
     # Execute all steps of queue until first error
-    def walking
-      while queue.count > 0
+    def walking(options = {})
+      position = options[:position] || 1
+      while queue.count >= position
         step = walk
         yield(step) if block_given?
         break if (step.nil? || step.error?)
