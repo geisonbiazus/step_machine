@@ -141,7 +141,7 @@ describe "StepMachine" do
 			step("Step 3", "value 3") { "value 3" }
 			queue.count.should == 3
 			walking
-			queue.count.should == 1
+			queue.count.should == 2
 		end
 
 		it "should clean queue, queue_completed, queue_failed if call clear_queue" do

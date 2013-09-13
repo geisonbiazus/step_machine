@@ -67,7 +67,7 @@ module StepMachine
     def walking(options = {})
       position = options[:position] || 1
       while queue.count >= position
-        step = walk
+        step = walk position
         yield(step) if block_given?
         break if (step.nil? || step.error?)
       end
