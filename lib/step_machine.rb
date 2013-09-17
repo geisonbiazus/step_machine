@@ -31,21 +31,23 @@ module StepMachine
       @queue_failed ||= []
     end
 
-    def add_step(name, param=nil, block)
+    def add_step(name, param=nil, options=nil, block)
       step = Step.new
       step.name = name
       step.param = param
+      step.options = options
       step.block = block.instance_of?(String) ? eval(block) : block
       raise ArgumentError, "invalid block parameter of method add_step(#{name}, #{param}, #{block})" unless step.block.instance_of?(Proc)
       queue << step
     end
 
-    def step(name, param=nil, &block)
-      add_step(name, param, block)
+    def step(name, param=nil, options=nil, &block)
+      add_step(name, param, options, block)
     end
 
     # Execute one step of queue
-    def walk(position = nil)      
+    def walk(options ={})
+      position = options[:position] || nil
       return nil if (position && (position-1 < 0 || position-1 > queue.count))
       current_step = queue[position-1] if position
       return nil if (position && !current_step)
@@ -67,7 +69,7 @@ module StepMachine
     def walking(options = {})
       position = options[:position] || 1
       while queue.count >= position
-        step = walk position
+        step = walk :position => position
         yield(step) if block_given?
         break if (step.nil? || step.error?)
       end

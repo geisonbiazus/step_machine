@@ -5,9 +5,10 @@ module StepMachine
   # Name:: Responsavel por identificara etapa atraves no 'name'
   # Block:: Armazenar um bloco 'Proc' a ser executado
   # Params:: Parametros passados para o bloco
+  # Options:: Variável aberta, apenas para a passagem de valores de controle
   # Result:: Resultado da execução do block. Usar como conferência do valor setado
   class Step
-    attr_accessor :name, :param, :block, :result
+    attr_accessor :name, :param, :options, :block, :result
 
     def error?
       @error ||= false

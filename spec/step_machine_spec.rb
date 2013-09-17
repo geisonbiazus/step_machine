@@ -70,6 +70,13 @@ describe "StepMachine" do
 			queue.should_not be nil
 			queue_completed.should_not be nil
 		end
+
+		it "should add step with options and store in step class" do
+			add_step("Step 1", "params 1", "my_option", proc { "block" })
+		  walk
+		  queue_completed.first.options.should == "my_option"
+		end
+
 	end
 
 	describe "when use queue" do
@@ -158,7 +165,7 @@ describe "StepMachine" do
 			step("Step 1", "value 1") { "value 1" }
 			step("Step 2", "value 2") { "value 2" }
 			step("Step 3", "value 3") { "value 3" }
-			walk 2
+			walk :position => 2
 			queue_completed.first.name.should == "Step 2"		  
 		end
 
@@ -166,9 +173,9 @@ describe "StepMachine" do
 			step("Step 1", "value 1") { "value 1" }
 			step("Step 2", "value 2") { "value 2" }
 			step("Step 3", "value 3") { "value 3" }
-			walk(0).should == nil
+			walk(:position => 0).should == nil
 			queue_completed.should have(0).items
-			walk(4).should == nil
+			walk(:position => 4).should == nil
 			queue_completed.should have(0).items
 		end
 
@@ -184,19 +191,20 @@ describe "StepMachine" do
 
 	describe "When use goup of stpes" do
 
-		it "should add step with group and the group must be a symbol" do
-		  pending
-		end
+		# it "should add step with group and the group must be a symbol" do
+		#   pending
+		# 	step("Step 1", "value 1", :group => :goup_1) { "value 1" }		  
+		# end
 
-	  it "should walking only in specified group" do
-			pending "Only test was implemented"
-			step("Step 1", "value 1", :group => :goup_1) { "value 1" }
-			step("Step 2", "value 2", :group => :goup_1) { "value 2" }
-			step("Step 3", "value 3", :group => :goup_2) { "value 3" }
-			walking :group => :group_1
-			queue_completed.should have(2).items	    
-			queue.should have(1).items	    
-	  end
+	  # it "should walk only in specified group" do
+		# 	pending "Only test was implemented"
+		# 	step("Step 1", "value 1", :group => :goup_1) { "value 1" }
+		# 	step("Step 2", "value 2", :group => :goup_1) { "value 2" }
+		# 	step("Step 3", "value 3", :group => :goup_2) { "value 3" }
+		# 	walk :group => :group_1
+		# 	queue_completed.should have(2).items	    
+		# 	queue.should have(1).items	    
+	  # end
 	end
 
 end
