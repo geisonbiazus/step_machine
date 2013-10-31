@@ -19,11 +19,53 @@ describe Step do
 		@step.validation.should == 1
 	end
 
+	it "should assign a block to the next_step" do
+		block = proc {|step| }
+		@step.next_step(&block)
+		@step.next_step.should == block
+	end
+
+	describe "next" do
+
+		it "should return the next step" do
+			next_step = Step.new(:step_2)
+
+			@step.next_step = next_step
+			@step.next.should == next_step
+		end
+
+		it "should return the next step evaluating the block" do
+			next_step = Step.new(:step_2)
+
+			@step.next_step do |s|
+				s.should == @step
+			end
+
+			@step.next
+		end
+
+		it "should return the next step evaluating the block" do
+			next_step = Step.new(:step_2)
+
+			@step.next_step { next_step }
+			@step.next.should == next_step
+		end
+
+	end
+
 	describe "on perform" do
 
 		it "should execute the block and store the result" do
 			@step.perform
 			@step.result.should == 2
+		end
+
+		it "should pass the step to the block" do
+			@step.block = proc do |step|
+				step.should == @step
+			end
+
+			@step.perform
 		end
 
 		it "should evaluate the validation block" do

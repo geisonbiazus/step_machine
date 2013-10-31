@@ -10,7 +10,6 @@ module StepMachine
 
   module InstanceMethods
 
-
     def step(name, &block)
       @steps ||= []
 
@@ -19,6 +18,7 @@ module StepMachine
       end
 
       step.block = block if block
+      @first_step ||= step
 
       step
     end
@@ -34,6 +34,15 @@ module StepMachine
       @steps << step
       @steps[-2].next_step = step if @steps.length > 1
       step
+    end
+
+    def run_steps
+      step = @first_step
+
+      while step
+        break unless step.perform
+        step = step.next
+      end
     end
 
   end
