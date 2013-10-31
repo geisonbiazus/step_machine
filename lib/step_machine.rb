@@ -23,7 +23,36 @@ module StepMachine
       step
     end
 
+    def on_step_failure(options = {}, &block)
+      @step_failures ||= []
+      @step_failures << options.merge(:block => block)
+    end
+
+    def run_steps
+      step = @first_step
+
+      while step
+        unless step.perform
+          execute_step_failures(step)
+          break
+        end
+
+        step = step.next
+      end
+    end
+
     private
+
+    def execute_step_failures(step)
+      if @step_failures
+        @step_failures.each do |step_failure|
+          next if step_failure.has_key?(:only) && !step_failure[:only].include?(step.name)
+          next if step_failure.has_key?(:except) && step_failure[:except].include?(step.name)
+
+          step_failure[:block].call(step)
+        end
+      end
+    end
 
     def get_step(name)
       @steps.find { |step| step.name == name }
@@ -34,15 +63,6 @@ module StepMachine
       @steps << step
       @steps[-2].next_step = step if @steps.length > 1
       step
-    end
-
-    def run_steps
-      step = @first_step
-
-      while step
-        break unless step.perform
-        step = step.next
-      end
     end
 
   end

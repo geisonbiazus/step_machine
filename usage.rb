@@ -69,15 +69,9 @@ class Hdi
     before_each_step do
     end
     
-    before_all_steps do
-    end
-
     after_each_step do
     end
     
-    after_all_steps do
-    end
-
     run_steps
   end
 end

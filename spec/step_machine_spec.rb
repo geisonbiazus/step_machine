@@ -146,4 +146,70 @@ describe "StepMachine" do
 		end
 	end
 
+	describe "on_step_failure" do
+
+		it "it should execute the given block if the step fails" do
+		  step(:step_1){ }.validate{false}
+
+		  x = 0
+		  on_step_failure{x += 1}
+
+		  run_steps
+
+		  x.should == 1
+		end
+
+		it "it should execute more than one blocks if the step fails" do
+		  step(:step_1){ }.validate{false}
+
+		  x = 0
+		  on_step_failure{x += 1}
+		  on_step_failure{x += 2}
+
+		  run_steps
+		  
+		  x.should == 3
+		end
+
+		it "should pass the failed step to the block" do 
+		  step_1 = step(:step_1){ }.validate{false}
+
+		  x = 0
+		  on_step_failure do |step|
+		  	step.should == step_1
+		  end
+
+		  run_steps
+		end
+
+		it "should execute the on step failure block only on the given steps" do
+			step(:step_1) {}.validate {false}
+			step(:step_2) {}.validate {false}
+
+			step_failed = nil
+			on_step_failure :only => [:step_1] {|s| step_failed = s.name}
+			run_steps
+			step_failed.should == :step_1
+
+			@first_step = step(:step_2)
+			step_failed = nil
+			run_steps
+			step_failed.should == nil
+		end
+
+		it "should execute the on step failure block excluding on the given steps" do
+			step(:step_1) {}.validate {false}
+			step(:step_2) {}.validate {false}
+
+			step_failed = nil
+			on_step_failure :except => [:step_2] {|s| step_failed = s.name}
+			run_steps
+			step_failed.should == :step_1
+
+			@first_step = step(:step_2)
+			step_failed = nil
+			run_steps
+			step_failed.should == nil
+		end
+	end
 end

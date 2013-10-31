@@ -11,10 +11,12 @@ module StepMachine
 
     def validate(value = nil, &block)     
       @validation = block || value
+      self
     end
 
     def success(&block)
       @success = block
+      self
     end
 
     def next_step(&block)

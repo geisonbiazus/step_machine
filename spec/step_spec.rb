@@ -7,11 +7,24 @@ describe Step do
 		@step.block = proc { 1 + 1 }
 	end
 	
-	it "should assign a block validation to the step" do
+	it "validate should assign a block validation to the step" do
+
 		block = proc {|step| step.result = 2}
 
 		@step.validate(&block)
 		@step.validation.should == block
+	end
+
+	it "validate should return the step" do
+		block = proc {|step| step.result = 2}
+
+		@step.validate(&block).should == @step
+	end
+
+	it "success should return the step" do
+		block = proc {|step| step.result = 2}
+
+		@step.validate(&block).should == @step
 	end
 
 	it "should assign a value to validate the result of the step" do
@@ -106,6 +119,7 @@ describe Step do
 		  @step.perform
 			x.should == 1
 		end
+
 	end
 
 end
