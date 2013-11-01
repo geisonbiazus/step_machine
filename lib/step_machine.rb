@@ -11,58 +11,20 @@ module StepMachine
   module InstanceMethods
 
     def step(name, &block)
-      @steps ||= []
-
-      unless step = get_step(name)
-        step = create_step(name)  
-      end
-
-      step.block = block if block
-      @first_step ||= step
-
-      step
+      @step_machine_runner ||= Runner.new
+      @step_machine_runner.step(name, &block)
     end
 
     def on_step_failure(options = {}, &block)
-      @step_failures ||= []
-      @step_failures << options.merge(:block => block)
+      @step_machine_runner.on_step_failure(options, &block)
     end
 
     def run_steps
-      step = @first_step
-
-      while step
-        unless step.perform
-          execute_step_failures(step)
-          break
-        end
-
-        step = step.next
-      end
+      @step_machine_runner.run
     end
 
-    private
-
-    def execute_step_failures(step)
-      if @step_failures
-        @step_failures.each do |step_failure|
-          next if step_failure.has_key?(:only) && !step_failure[:only].include?(step.name)
-          next if step_failure.has_key?(:except) && step_failure[:except].include?(step.name)
-
-          step_failure[:block].call(step)
-        end
-      end
-    end
-
-    def get_step(name)
-      @steps.find { |step| step.name == name }
-    end
-
-    def create_step(name)
-      step = Step.new(name)
-      @steps << step
-      @steps[-2].next_step = step if @steps.length > 1
-      step
+    def first_step(step)
+      @step_machine_runner.first_step = step
     end
 
   end
