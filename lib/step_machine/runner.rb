@@ -1,7 +1,7 @@
 module StepMachine
 	class Runner
 
-		attr_accessor :first_step, :continue, :next_step, :times_to_repeat
+		attr_accessor :first_step, :continue, :next_step, :times_to_repeat, :repeat_what
 		attr_reader :status, :failed_step
 
 		def initialize
@@ -51,17 +51,7 @@ module StepMachine
       unless step.perform      	
         @failed_step = step
 
-        if @times_to_repeat >= 0
-        	@times_to_repeat -= 1
-
-        	if @times_to_repeat == -1
-        		@status = :failure
-        		return 
-        	end
-
-        	@next_step = @first_step
-        	return run
-        end
+        return repeat if repeat?        
 
         execute_step_failures(step)
 
@@ -109,6 +99,23 @@ module StepMachine
       step
     end
 
+    def repeat?
+    	@times_to_repeat >= 0
+    end
+
+    def repeat
+    	@times_to_repeat -= 1
+
+    	if @times_to_repeat == -1
+        @status = :failure
+        return 
+      end
+
+      @next_step = @repeat_what == :process ? @first_step : @failed_step
+      return run
+    end
+
+
     class FailureTreatment
     	attr_accessor :step
     	
@@ -133,6 +140,8 @@ module StepMachine
 
     	def repeat
     		go_to(@step.name)
+    		@runner.repeat_what = :step
+    		self
     	end
 
     	def continue
@@ -141,6 +150,7 @@ module StepMachine
 
     	def restart
     		go_to(@runner.first_step.name)
+    		@runner.repeat_what = :process
     		self
     	end
 

@@ -324,6 +324,26 @@ describe StepMachine::Runner do
 			@runner.times_to_repeat.should == -1
 			@runner.status.should == :failure
 		end
+
+		it "should repeat step 2 times" do
+			order = []			
+
+			block = proc {|s| order << s.name}
+
+			@runner.step(:step_1, &block)
+			@runner.step(:step_2, &block).validate { false }
+			@runner.step(:step_3, &block)
+
+			@runner.on_step_failure do |f|
+				f.repeat.times(2)
+			end
+
+			@runner.run
+
+			order.should == [:step_1, :step_2, :step_2, :step_2]
+			@runner.times_to_repeat.should == -1
+			@runner.status.should == :failure
+		end
 	end
 
 	describe "before each step" do
