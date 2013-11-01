@@ -32,7 +32,8 @@ describe "StepMachine" do
 			run_steps
 
 			step(:step).result.should == 2
-		end		
+		end	
+
 	end
 
 	describe "callbacks" do
@@ -74,5 +75,23 @@ describe "StepMachine" do
 		  x.should == 2
 		end
 
+	end
+
+	it "should return the status on run_status" do
+		step(:step_1){ }
+	  step(:step_2){ }
+
+	  run_steps
+
+	  run_status.should == :success
+	end
+
+	it "should return the failed step" do
+		step(:step_1){ }
+	  step(:step_2){ }.validate {false}
+
+	  run_steps
+
+	  failed_step.should == step(:step_2)
 	end
 end

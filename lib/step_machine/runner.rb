@@ -1,13 +1,15 @@
 module StepMachine
 	class Runner
 
-		attr_accessor :first_step
+		attr_accessor :first_step, :continue, :next_step, :times_to_repeat
+		attr_reader :status, :failed_step
 
 		def initialize
 			@steps = []
-			@step_failures = []
+			@failure_treatments = []
 			@before_each_step = []
-			@after_each_step = []
+			@after_each_step = []	
+			@times_to_repeat = -1
 		end
 
 		def step(name, &block)
@@ -17,12 +19,13 @@ module StepMachine
 
       step.block = block if block
       @first_step ||= step
+      @next_step ||= @first_step
 
       step
 		end
 
-		def on_step_failure(options = {}, &block)
-			@step_failures << options.merge(:block => block)
+		def on_step_failure(options = {}, &block)			
+			@failure_treatments << FailureTreatment.new(self, block, options)
 		end
 
 		def before_each_step(options = {}, &block)
@@ -33,19 +36,42 @@ module StepMachine
 			@after_each_step << options.merge(:block => block)
 		end
 
+		def first_step=(step)
+			@next_step = @first_step = step
+		end
+
 		def run
-			step = @first_step
+      @continue = nil
+			step = @next_step
 
-      while step
-      	execute_before_each_step(step)
-        unless step.perform
-          execute_step_failures(step)
-          break
+			@status ||= :success
+      
+      execute_before_each_step(step)
+
+      unless step.perform      	
+        @failed_step = step
+
+        if @times_to_repeat >= 0
+        	@times_to_repeat -= 1
+
+        	if @times_to_repeat == -1
+        		@status = :failure
+        		return 
+        	end
+
+        	@next_step = @first_step
+        	return run
         end
-      	execute_after_each_step(step)
 
-        step = step.next
+        execute_step_failures(step)
+
+        return run if @continue
+        @status = :failure
+        return
       end
+      execute_after_each_step(step)
+      
+      run if @next_step = step.next
 		end
 
 		private
@@ -67,11 +93,8 @@ module StepMachine
 		end
 
     def execute_step_failures(step)
-      @step_failures.each do |step_failure|
-        next if step_failure.has_key?(:only) && !step_failure[:only].include?(step.name)
-        next if step_failure.has_key?(:except) && step_failure[:except].include?(step.name)
-
-        step_failure[:block].call(step)
+      @failure_treatments.each do |failure_treatment|
+      	failure_treatment.treat(step)        
       end
     end
 
@@ -85,5 +108,47 @@ module StepMachine
       @steps[-2].next_step = step if @steps.length > 1
       step
     end
+
+    class FailureTreatment
+    	attr_accessor :step
+    	
+    	def initialize(runner, block, options)
+    		@runner = runner
+    		@block = block
+    		@options = options
+    	end
+
+    	def treat(step)    		
+    		return if @options.has_key?(:only) && !@options[:only].include?(step.name)
+        return if @options.has_key?(:except) && @options[:except].include?(step.name)
+        @step = step
+
+        @block.call(self)
+    	end
+
+    	def go_to(step_name)    		
+    		@runner.next_step = @runner.step(step_name)
+    		@runner.continue = true
+    	end
+
+    	def repeat
+    		go_to(@step.name)
+    	end
+
+    	def continue
+    		go_to(@step.next.name)
+    	end
+
+    	def restart
+    		go_to(@runner.first_step.name)
+    		self
+    	end
+
+    	def times(number)
+    		@runner.times_to_repeat = number - 1
+    	end
+
+    end
+
 	end	
 end

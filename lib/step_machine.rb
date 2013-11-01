@@ -35,6 +35,14 @@ module StepMachine
       @step_machine_runner.first_step = step
     end
 
+    def run_status
+      @step_machine_runner.status
+    end
+
+    def failed_step
+      @step_machine_runner.failed_step
+    end
+
   end
 
   def self.included(receiver)

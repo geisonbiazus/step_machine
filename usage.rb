@@ -59,11 +59,13 @@ class Hdi
       mail
     end
 
-    on_step_failure :only => {:dados_segurado, :pesquisar_veiculo} do
-      repeat_step if condition
+    on_step_failure :only => {:dados_segurado, :pesquisar_veiculo} do |step|
+      go_to_step step.name
+      repeat_step if condition            
       go_to_step :calcular if condition
       go_to_next_step if condition
       go_to_step(:calcular).and_stop if condition
+      restart
     end
 
     before_each_step do

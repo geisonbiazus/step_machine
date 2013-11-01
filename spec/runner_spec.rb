@@ -142,6 +142,21 @@ describe StepMachine::Runner do
 
 			order.should == [:step_1, :step_3]
 		end
+
+
+		it "should store the failed step" do
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+			@runner.step(:step_3) {}.validate { false }
+
+			@runner.step(:step_1).next_step = @runner.step(:step_3)
+			@runner.step(:step_3).next_step { @runner.step(:step_2) }
+			@runner.step(:step_2).next_step = nil
+
+			@runner.run
+
+			@runner.failed_step.should == @runner.step(:step_3)
+		end
 	end
 
 	describe "on_step_failure" do
@@ -173,8 +188,8 @@ describe StepMachine::Runner do
 		  step_1 = @runner.step(:step_1){ }.validate{false}
 
 		  x = 0
-		  @runner.on_step_failure do |step|
-		  	step.should == step_1
+		  @runner.on_step_failure do |f|
+		  	f.step.should == step_1
 		  end
 
 		  @runner.run
@@ -185,7 +200,7 @@ describe StepMachine::Runner do
 			@runner.step(:step_2) {}.validate {false}
 
 			step_failed = nil
-			@runner.on_step_failure :only => [:step_1] {|s| step_failed = s.name}
+			@runner.on_step_failure :only => [:step_1] {|f| step_failed = f.step.name}
 			@runner.run
 			step_failed.should == :step_1
 
@@ -200,7 +215,7 @@ describe StepMachine::Runner do
 			@runner.step(:step_2) {}.validate {false}
 
 			step_failed = nil
-			@runner.on_step_failure :except => [:step_2] {|s| step_failed = s.name}
+			@runner.on_step_failure :except => [:step_2] {|f| step_failed = f.step.name}
 			@runner.run
 			step_failed.should == :step_1
 
@@ -208,6 +223,106 @@ describe StepMachine::Runner do
 			step_failed = nil
 			@runner.run
 			step_failed.should == nil
+		end
+
+		it "should go to the specified step" do
+			order = []
+
+			block = proc {|s| order << s.name}
+
+			@runner.step(:step_1, &block).validate {false}
+			@runner.step(:step_2, &block)
+
+			@runner.on_step_failure do |treatment|
+				treatment.go_to :step_2
+			end
+
+			@runner.run
+
+			order.should == [:step_1, :step_2]
+			@runner.status.should == :success
+		end
+
+		it "should repeat the failed step" do
+			order = []
+			count = 0
+
+			block = proc {|s| order << s.name}
+
+			@runner.step(:step_1, &block).validate {false}
+			@runner.step(:step_2, &block)
+
+			@runner.on_step_failure do |f|
+				f.repeat if count == 0
+				count += 1
+			end
+
+			@runner.run
+
+			order.should == [:step_1, :step_1]
+			@runner.status.should == :failure
+		end
+
+		it "should ignore the failure and continue" do
+			order = []			
+
+			block = proc {|s| order << s.name}
+
+			@runner.step(:step_1, &block).validate {false}
+			@runner.step(:step_2, &block)
+
+			@runner.on_step_failure do |f|
+				f.continue
+			end
+
+			@runner.run
+
+			order.should == [:step_1, :step_2]
+			@runner.status.should == :success
+		end
+
+
+		it "should restart the process" do
+			order = []			
+			count = 0
+
+			block = proc {|s| order << s.name}
+
+			@runner.step(:step_1, &block)
+			@runner.step(:step_2, &block).validate do |s|
+				count += 1
+				count > 1
+			end
+			@runner.step(:step_3, &block)
+
+			@runner.on_step_failure do |f|
+				f.restart
+			end
+
+			@runner.run
+
+			order.should == [:step_1, :step_2, :step_1, :step_2, :step_3]
+			@runner.status.should == :success
+		end
+
+		it "should restart the process 2 times" do
+			order = []			
+
+			block = proc {|s| order << s.name}
+
+			@runner.step(:step_1, &block)
+			@runner.step(:step_2, &block).validate { false }
+			@runner.step(:step_3, &block)
+
+			@runner.on_step_failure do |f|
+				f.restart.times(2)
+			end
+
+			@runner.run
+
+			order.should == [:step_1, :step_2, :step_1, :step_2, :step_1, :step_2]
+			@runner.times_to_repeat.should == -1
+			@runner.status.should == :failure
 		end
 	end
 
@@ -285,5 +400,27 @@ describe StepMachine::Runner do
 
 			executed.should == [:step_1]
 		end
+	end
+
+	describe "result status" do
+
+		it "should be success if all steps were performed" do
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.run
+
+			@runner.status.should == :success
+		end
+
+		it "should be failure if all steps were performed" do
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}.validate {false}
+
+			@runner.run
+
+			@runner.status.should == :failure
+		end
+
 	end
 end
