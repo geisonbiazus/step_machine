@@ -210,4 +210,80 @@ describe StepMachine::Runner do
 			step_failed.should == nil
 		end
 	end
+
+	describe "before each step" do
+		it "should execute the block given" do
+			executed = []
+
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.before_each_step {|s| executed << s.name}
+			@runner.run
+
+			executed.should == [:step_1, :step_2]
+		end
+
+		it "should execute the block given only in the given steps" do
+			executed = []
+
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.before_each_step :only => [:step_2] {|s| executed << s.name}
+			@runner.run
+
+			executed.should == [:step_2]
+		end
+
+		it "should execute the block given except in the given steps" do
+			executed = []
+
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.before_each_step :except => [:step_2] {|s| executed << s.name}
+			@runner.run
+
+			executed.should == [:step_1]
+		end
+	end
+
+	describe "after each step" do
+		it "should execute the block given" do
+			executed = []
+
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.after_each_step {|s| executed << s.name}
+			@runner.run
+
+			executed.should == [:step_1, :step_2]
+		end
+
+		it "should execute the block given only in the given steps" do
+			executed = []
+
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.after_each_step :only => [:step_2] {|s| executed << s.name}
+			@runner.run
+
+			executed.should == [:step_2]
+		end
+
+		it "should execute the block given except in the given steps" do
+			executed = []
+
+			@runner.step(:step_1) {}
+			@runner.step(:step_2) {}
+
+			@runner.after_each_step :except => [:step_2] {|s| executed << s.name}
+			@runner.run
+
+			executed.should == [:step_1]
+		end
+	end
 end

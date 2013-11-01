@@ -19,6 +19,14 @@ module StepMachine
       @step_machine_runner.on_step_failure(options, &block)
     end
 
+    def before_each_step(options = {}, &block)
+      @step_machine_runner.before_each_step(options, &block)
+    end
+
+    def after_each_step(options = {}, &block)
+      @step_machine_runner.after_each_step(options, &block)
+    end
+
     def run_steps
       @step_machine_runner.run
     end

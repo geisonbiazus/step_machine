@@ -35,9 +35,9 @@ describe "StepMachine" do
 		end		
 	end
 
-	describe "on_step_failure" do
+	describe "callbacks" do
 
-		it "it should execute the given block if the step fails" do
+		it "on_step_failure should execute the given block if the step fails" do
 		  step(:step_1){ }.validate{false}
 
 		  x = 0
@@ -46,6 +46,32 @@ describe "StepMachine" do
 		  run_steps
 
 		  x.should == 1
+		end
+
+		it "should execute the given block before each step" do
+
+		  step(:step_1){ }
+		  step(:step_2){ }
+
+		  x = 0
+		  before_each_step {x += 1}
+
+		  run_steps
+
+		  x.should == 2
+		end
+
+		it "should execute the given block before each step" do
+
+		  step(:step_1){ }
+		  step(:step_2){ }
+
+		  x = 0
+		  after_each_step {x += 1}
+
+		  run_steps
+
+		  x.should == 2
 		end
 
 	end
