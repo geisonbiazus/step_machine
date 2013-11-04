@@ -73,17 +73,17 @@ or:
 		end
 
 		before_each_step do |step|
-			// code
+			# code
 		end
 
 		after_each_step do |step|
-			// code
+			# code
 		end
 
 ## Executing code if a step runs successful
 
 		step(:step_1).success do |step|
-		 // code
+			# code
 		end
 
 
