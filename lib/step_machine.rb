@@ -10,69 +10,37 @@ module StepMachine
 
   module InstanceMethods
 
-    def clear_queues
-      @queue = []
-      @queue_failed = []
-      @queue_completed = []
+    def step(name, &block)
+      @step_machine_runner ||= Runner.new
+      @step_machine_runner.step(name, &block)
     end
 
-    # Fila para execução
-    def queue
-      @queue ||= []
+    def on_step_failure(options = {}, &block)
+      @step_machine_runner.on_step_failure(options, &block)
     end
 
-    # Fila das execuções completadas
-    def queue_completed
-      @queue_completed ||= []
+    def before_each_step(options = {}, &block)
+      @step_machine_runner.before_each_step(options, &block)
     end
 
-    # Fila das execuções com falhadas
-    def queue_failed
-      @queue_failed ||= []
+    def after_each_step(options = {}, &block)
+      @step_machine_runner.after_each_step(options, &block)
     end
 
-    def add_step(name, param=nil, options=nil, block)
-      step = Step.new
-      step.name = name
-      step.param = param
-      step.options = options
-      step.block = block.instance_of?(String) ? eval(block) : block
-      raise ArgumentError, "invalid block parameter of method add_step(#{name}, #{param}, #{block})" unless step.block.instance_of?(Proc)
-      queue << step
+    def run_steps
+      @step_machine_runner.run
     end
 
-    def step(name, param=nil, options=nil, &block)
-      add_step(name, param, options, block)
+    def first_step(step)
+      @step_machine_runner.first_step = step
     end
 
-    # Execute one step of queue
-    def walk(options ={})
-      position = options[:position] || nil
-      return nil if (position && (position-1 < 0 || position-1 > queue.count))
-      current_step = queue[position-1] if position
-      return nil if (position && !current_step)
-      current_step = queue.first unless position
-
-      step = queue.delete(current_step) || (return nil)      
-      begin
-        step.result = step.block.call(step.param)
-        queue_completed << step
-      rescue Exception => e
-        step.result = e.message
-        step.error = true
-        queue_failed << step
-      end
-      step
+    def run_status
+      @step_machine_runner.status
     end
 
-    # Execute all steps of queue until first error
-    def walking(options = {})
-      position = options[:position] || 1
-      while queue.count >= position
-        step = walk :position => position
-        yield(step) if block_given?
-        break if (step.nil? || step.error?)
-      end
+    def failed_step
+      @step_machine_runner.failed_step
     end
 
   end

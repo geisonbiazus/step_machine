@@ -1,22 +1,56 @@
 module StepMachine
 
-  # = Objeto etapas
-  # Objetivo da etapa é ser cada campo em que se adiciona informação.
-  # Name:: Responsavel por identificara etapa atraves no 'name'
-  # Block:: Armazenar um bloco 'Proc' a ser executado
-  # Params:: Parametros passados para o bloco
-  # Options:: Variável aberta, apenas para a passagem de valores de controle
-  # Result:: Resultado da execução do block. Usar como conferência do valor setado
   class Step
-    attr_accessor :name, :param, :options, :block, :result
 
-    def error?
-      @error ||= false
+    attr_accessor :name, :block, :next_step
+    attr_reader :exception, :result, :validation
+
+    def initialize(name)
+      self.name = name
     end
 
-    def error=(opt)
-      @error = opt
+    def validate(value = nil, &block)     
+      @validation = block || value
+      self
     end
+
+    def success(&block)
+      @success = block
+      self
+    end
+
+    def next_step(&block)
+      @next_step = block if block
+      @next_step
+    end
+
+    def next
+      return next_step.call(self) if next_step.is_a?(Proc)
+      next_step
+    end
+
+    def perform
+      @result = block.call(self)
+      valid = valid?
+      @success.call(self) if @success && valid
+      valid
+    rescue => e
+      @exception = e
+      false
+    end
+
+    private
+
+    def valid?
+      if validation 
+        return validation.call(self) if validation.is_a?(Proc)
+        return result.match(validation) if validation.is_a?(Regexp)
+        return validation == result
+      end
+      true
+    end
+
+   
   end
 	
 end
