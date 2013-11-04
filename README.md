@@ -18,11 +18,11 @@ And then execute:
 	include StepMachine
 	
 	step(:step_1) do
-	# code for step 1
+		# code for step 1
 	end
 	
 	step(:step_2) do
-	# code for step 2
+		# code for step 2
 	end
 	
 	run_steps
