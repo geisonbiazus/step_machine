@@ -6,19 +6,86 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem 'step_machine'
+    gem 'step_machine', git: git@bitbucket.org:geisonbiazus/step_machine.git
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install step_machine
-
 ## Usage
 
-Include the StepMachine in your class and add steps using the 'step' method and then execute steps with 'walk/walking' method
+## Creating and running steps:
+
+		step(:step_1) do
+			# code for step 1
+		end
+
+		step(:step_2) do
+			# code for step 2
+		end
+
+		run_steps
+
+This code will run the steps in the created order
+
+## Changing the execution order
+
+		step(:step_1).next_step = step(:step_2)
+
+or:
+
+		step(:step_1).next_step do
+			step(:step_2)
+		end
+
+## Validating steps
+
+		step(:step_1).validate do |step|
+			step.result == "OK"
+		end
+
+		step(step_1).validate(/^OK/)
+
+		step(step_1).validate('OK")
+
+## Callbacks
+
+		on_step_failure do |f|
+
+			f.go_to :step_2			
+
+		end
+
+		on_step_failure :only => [:step_2] do |f|
+
+			f.restart
+
+		end
+
+		on_step_failure :except => [:step_1] do |f|
+
+			if contition
+				f.repeat
+			else
+				f.continue
+			end
+
+		end
+
+		before_each_step do |step|
+			// code
+		end
+
+		after_each_step do |step|
+			// code
+		end
+
+## Executing code if a step runs successful
+
+		step(:step_1).success do |step|
+		 // code
+		end
+		
 
 ## Contributing
 
@@ -27,5 +94,3 @@ Include the StepMachine in your class and add steps using the 'step' method and 
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-
