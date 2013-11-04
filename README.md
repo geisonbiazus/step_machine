@@ -47,7 +47,7 @@ or:
 	
 	step(step_1).validate(/^OK/)
 	
-	step(step_1).validate('OK")
+	step(step_1).validate('OK')
 
 ## Callbacks
 
