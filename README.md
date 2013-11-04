@@ -15,77 +15,71 @@ And then execute:
 ## Usage
 
 ## Creating and running steps:
-		include StepMachine
-
-		step(:step_1) do
-			# code for step 1
-		end
-
-		step(:step_2) do
-			# code for step 2
-		end
-
-		run_steps
+	include StepMachine
+	
+	step(:step_1) do
+	# code for step 1
+	end
+	
+	step(:step_2) do
+	# code for step 2
+	end
+	
+	run_steps
 
 This code will run the steps in the created order
 
 ## Changing the execution order
 
-		step(:step_1).next_step = step(:step_2)
+	step(:step_1).next_step = step(:step_2)
 
 or:
 
-		step(:step_1).next_step do
-			step(:step_2)
-		end
+	step(:step_1).next_step do
+		step(:step_2)
+	end
 
 ## Validating steps
 
-		step(:step_1).validate do |step|
-			step.result == "OK"
-		end
-
-		step(step_1).validate(/^OK/)
-
-		step(step_1).validate('OK")
+	step(:step_1).validate do |step|
+		step.result == "OK"
+	end
+	
+	step(step_1).validate(/^OK/)
+	
+	step(step_1).validate('OK")
 
 ## Callbacks
 
-		on_step_failure do |f|
-
-			f.go_to :step_2			
-
+	on_step_failure do |f|
+		f.go_to :step_2		
+	end
+	
+	on_step_failure :only => [:step_2] do |f|
+		f.restart
+	end
+	
+	on_step_failure :except => [:step_1] do |f|
+		if contition
+			f.repeat
+		else
+			f.continue
 		end
-
-		on_step_failure :only => [:step_2] do |f|
-
-			f.restart
-
-		end
-
-		on_step_failure :except => [:step_1] do |f|
-
-			if contition
-				f.repeat
-			else
-				f.continue
-			end
-
-		end
-
-		before_each_step do |step|
-			# code
-		end
-
-		after_each_step do |step|
-			# code
-		end
+	end
+	
+	before_each_step do |step|
+		# code
+	end
+	
+	after_each_step do |step|
+		# code
+	end
 
 ## Executing code if a step runs successful
 
-		step(:step_1).success do |step|
-			# code
-		end
+	step(:step_1).success do |step|
+		# code
+	end
 
 
 ## Contributing
