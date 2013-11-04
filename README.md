@@ -1,6 +1,6 @@
 # StepMachine
 
-TODO: Write a gem description
+step_machine is a simple gem for executing code based in steps. Each step can be validated and if a step fails, the execution is aborted. 
 
 ## Installation
 
@@ -85,7 +85,7 @@ or:
 		step(:step_1).success do |step|
 		 // code
 		end
-		
+
 
 ## Contributing
 
