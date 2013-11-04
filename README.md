@@ -15,6 +15,7 @@ And then execute:
 ## Usage
 
 ## Creating and running steps:
+		include StepMachine
 
 		step(:step_1) do
 			# code for step 1
