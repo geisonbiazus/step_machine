@@ -1,4 +1,4 @@
-Copyright (c) 2013 Rafael Vettori
+Copyright (c) 2013 Rafael Vettori and Geison Biazus
 
 MIT License
 
