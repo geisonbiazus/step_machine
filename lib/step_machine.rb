@@ -2,6 +2,7 @@
 
 require "step_machine/version"
 require "step_machine/step"
+require "step_machine/runner"
 
 module StepMachine
 
