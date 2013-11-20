@@ -2,7 +2,7 @@ module StepMachine
 
   class Step
 
-    attr_accessor :name, :block, :next_step
+    attr_accessor :name, :block, :next_step, :group
     attr_reader :exception, :result, :validation
 
     def initialize(name)

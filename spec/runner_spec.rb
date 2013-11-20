@@ -6,6 +6,47 @@ describe StepMachine::Runner do
 		@runner = StepMachine::Runner.new
 	end	
 
+	describe 'on group' do
+
+		it "should create and return the group" do
+			group = @runner.group(:group)
+
+			group.should be_a(StepMachine::Group)
+			group.name.should == :group
+		end
+
+		it "should return an existing group" do
+			group = @runner.group(:group)
+
+			@runner.group(:group).should be == group			
+		end
+
+		it "should assign the first step defined as first step of group" do
+			@runner.group(:group_1) do
+				@runner.step(:step_1) {}
+				@runner.step(:step_2) {}
+			end
+
+			@runner.group(:group_1).first_step.should == @runner.step(:step_1)
+		end
+
+		it "should create an step with the surrounding group" do
+			@runner.group(:group_1) do
+				@runner.step(:step_1) {}
+			end
+
+			@runner.group(:group_2) do
+				@runner.step(:step_2) {}
+			end
+
+			@runner.step(:step_3) {}
+
+			@runner.step(:step_1).group.name.should == :group_1
+			@runner.step(:step_2).group.name.should == :group_2
+			@runner.step(:step_3).group.should be_nil			
+		end
+	end
+
 	describe "on step" do
 
 		it "should create an step with the given name and block" do
@@ -49,7 +90,7 @@ describe StepMachine::Runner do
 		end
 	end
 
-	describe "on run_steps" do
+	describe "on run" do
 		it "should run the given step" do
 			@runner.step(:step) { 1 + 1}
 
@@ -156,6 +197,22 @@ describe StepMachine::Runner do
 			@runner.run
 
 			@runner.failed_step.should == @runner.step(:step_3)
+		end
+
+		it "should run only the steps of the given group" do
+			order = []
+
+			block = proc { |s| order << s.name }
+
+			@runner.group :group do
+				@runner.step(:step_1, &block)
+				@runner.step(:step_2, &block)
+			end
+			@runner.step(:step_3, &block)
+
+			@runner.run(:group)
+
+			order.should == [:step_1, :step_2]
 		end
 	end
 

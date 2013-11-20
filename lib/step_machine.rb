@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require "step_machine/version"
+require "step_machine/group"
 require "step_machine/step"
 require "step_machine/runner"
 

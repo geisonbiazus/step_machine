@@ -10,6 +10,11 @@ class Hdi
 
   def define_steps
 
+    group :login do
+      step :acessaar_pagina
+      step :sucursal
+    end    
+
     step :dados_segurado do
       agent.post("", "")
     end.validate { |step| step.result.body.match(/cod_cotacao/) }
