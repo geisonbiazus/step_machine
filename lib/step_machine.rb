@@ -12,6 +12,11 @@ module StepMachine
 
   module InstanceMethods
 
+    def group(name, &block)
+      @step_machine_runner ||= Runner.new
+      @step_machine_runner.group(name, &block)
+    end
+
     def step(name, &block)
       @step_machine_runner ||= Runner.new
       @step_machine_runner.step(name, &block)
@@ -29,8 +34,8 @@ module StepMachine
       @step_machine_runner.after_each_step(options, &block)
     end
 
-    def run_steps
-      @step_machine_runner.run
+    def run_steps(group_name = nil)
+      @step_machine_runner.run(group_name)
     end
 
     def first_step(step)

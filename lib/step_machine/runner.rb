@@ -23,6 +23,7 @@ module StepMachine
 		end
 
     def group(name)
+      return nil if name.nil?
       @current_group = group = @groups.detect {|g| g.name == name} || create_group(name)    
       yield if block_given?
       @current_group = nil
@@ -46,14 +47,9 @@ module StepMachine
 		end
 
 		def run(group_name = nil)
-      group = group_name ? group(group_name) : nil
-
-      if group 
-        if !@first_group_step
-          @next_step = group.first_step
-          @first_group_step = true
-        end
-
+      
+      if group = group(group_name)
+        assign_group_first_step(group)
         return if @next_step.group != group
       end
 
@@ -81,6 +77,13 @@ module StepMachine
 		end
 
 		private
+
+    def assign_group_first_step(group)
+     if !@group_first_step
+        @next_step = group.first_step
+        @group_first_step = true
+      end
+    end
 
 		def execute_before_each_step(step)
 			@before_each_step.each do |before|

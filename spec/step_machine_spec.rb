@@ -25,6 +25,18 @@ describe "StepMachine" do
 
 	end
 
+	describe "on group" do
+
+		it "should create an group and assign to the steps" do
+			group(:group) do
+				step(:step_1)
+			end
+
+			step(:step_1).group.should == group(:group)
+		end
+
+	end
+
 	describe "on run_steps" do
 		it "should run the given steps" do
 			step(:step) { 1 + 1}
@@ -32,6 +44,20 @@ describe "StepMachine" do
 			run_steps
 
 			step(:step).result.should == 2
+		end	
+
+		it "should run the steps of the given group" do
+			x = 0
+
+			group(:group) do
+				step(:step) { x += 1 }
+			end
+				
+			step(:step_2) { x += 1 }
+
+			run_steps(:group)
+
+			x.should == 1
 		end	
 
 	end
