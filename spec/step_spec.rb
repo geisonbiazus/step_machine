@@ -142,7 +142,7 @@ describe Step do
 
 		it "should not execute the step if the condition block is false" do
 			@step.condition { false }
-			@step.perform
+			@step.perform.should be_true
 			@step.should_not be_performed
 		end
 

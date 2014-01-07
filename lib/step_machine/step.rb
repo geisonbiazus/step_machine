@@ -35,7 +35,7 @@ module StepMachine
     end
 
     def perform
-      return if condition_block && !condition_block.call
+      return true if condition_block && !condition_block.call
       @performed = true
       @result = block.call(self)
       valid = valid?
