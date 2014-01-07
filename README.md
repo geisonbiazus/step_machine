@@ -81,6 +81,39 @@ or:
 		# code
 	end
 
+## Conditional Steps
+
+	step(:step_1).condition do 
+		true
+	end
+
+## Executing a step depending on other step condition
+
+	step(:step_2) do
+		# code
+	end.condition do 
+		step(:step_1).performed?
+	end
+
+## Grouping steps
+
+	group :group_1 do
+
+		step :step_1 do
+			#code
+		end
+
+		step :step_2 do
+			#code
+		end
+
+	end
+
+	step :step_3 do
+		#code
+	end
+
+	run_steps(:group_1) # only the steps 1 and 2 will be performed
 
 ## Contributing
 
