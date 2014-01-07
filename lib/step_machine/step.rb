@@ -3,7 +3,7 @@ module StepMachine
   class Step
 
     attr_accessor :name, :block, :next_step, :group
-    attr_reader :exception, :result, :validation
+    attr_reader :exception, :result, :validation, :condition_block
 
     def initialize(name)
       self.name = name
@@ -24,12 +24,19 @@ module StepMachine
       @next_step
     end
 
+    def condition(&block)
+      @condition_block = block if block
+      self
+    end
+
     def next
       return next_step.call(self) if next_step.is_a?(Proc)
       next_step
     end
 
     def perform
+      return if condition_block && !condition_block.call
+      @performed = true
       @result = block.call(self)
       valid = valid?
       @success.call(self) if @success && valid
@@ -37,6 +44,10 @@ module StepMachine
     rescue => e
       @exception = e
       false
+    end
+
+    def performed?
+      !!@performed
     end
 
     private

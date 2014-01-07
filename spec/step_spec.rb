@@ -38,6 +38,12 @@ describe Step do
 		@step.next_step.should == block
 	end
 
+	it "should assign a condition block" do
+		block = proc {}
+		@step.condition(&block).should == @step
+		@step.condition_block.should == block
+	end
+
 	describe "next" do
 
 		it "should return the next step" do
@@ -118,6 +124,26 @@ describe Step do
 			x.should == 0
 		  @step.perform
 			x.should == 1
+		end
+
+		it "should return true if step was executed" do
+			step_a = Step.new(:step_a)
+			step_a.block = proc { "step_a" }
+			step_a.should_not be_performed
+			step_a.perform
+			step_a.should be_performed
+		end
+
+		it "should evaluate the condition block to execute the step" do						
+			@step.condition { true }
+			@step.perform
+			@step.should be_performed
+		end
+
+		it "should not execute the step if the condition block is false" do
+			@step.condition { false }
+			@step.perform
+			@step.should_not be_performed
 		end
 
 	end
