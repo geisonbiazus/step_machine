@@ -34,8 +34,8 @@ module StepMachine
       @step_machine_runner.after_each_step(options, &block)
     end
 
-    def run_steps(group_name = nil)
-      @step_machine_runner.run(group_name)
+    def run_steps(options = {})
+      @step_machine_runner.run(options)
     end
 
     def first_step(step)

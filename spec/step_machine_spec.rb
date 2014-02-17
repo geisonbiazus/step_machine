@@ -55,11 +55,21 @@ describe "StepMachine" do
 				
 			step(:step_2) { x += 1 }
 
-			run_steps(:group)
+			run_steps({:group => :group})
 
 			x.should == 1
 		end	
 
+		it "should run the steps up to given step" do
+		  x = 0
+		  step(:step_1) { x += 1 }
+		  step(:step_2) { x += 1 }
+		  step(:step_3) { x += 1 }
+
+		  run_steps :upto => :step_2
+
+		  x.should == 2
+		end
 	end
 
 	describe "callbacks" do

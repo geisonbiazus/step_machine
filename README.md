@@ -113,8 +113,18 @@ or:
 		#code
 	end
 
-	run_steps(:group_1) # only the steps 1 and 2 will be performed
+	run_steps( {:group => :group_1} ) # only the steps 1 and 2 will be performed
 
+## Execute from and/or upto defined step
+
+	step :step_1 { ... }
+	step :step_2 { ... }
+	step :step_3 { ... }
+	step :step_4 { ... }
+	run_steps :upto => :step_2                   # should execute :step_1 end :step_2
+	run_steps :from => :step_3                   # should execute :step_3 end :step_4
+	run_steps :from => :step2, :upto => :step_3  # should execute :step_2 end :step_3
+	
 ## Contributing
 
 1. Fork it

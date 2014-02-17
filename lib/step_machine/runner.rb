@@ -46,12 +46,13 @@ module StepMachine
 			@next_step = @first_step = step
 		end
 
-		def run(group_name = nil)
-      
-      if group = group(group_name)
+    def run(options = {})
+      if group = group(options[:group])
         assign_group_first_step(group)
         return if @next_step.group != group
       end
+
+      assign_from_step(options[:from]) unless options[:from].nil?
 
       @continue = nil
 			step = @next_step
@@ -73,10 +74,19 @@ module StepMachine
       end
       execute_after_each_step(step)
       
-      run(group_name) if @next_step = step.next
+      return if step.name == options[:upto]
+
+      run(options) if @next_step = step.next
 		end
 
 		private
+
+    def assign_from_step(step)
+      if !@from_first_step
+        @next_step = get_step(step)
+        @from_first_step = true
+      end
+    end
 
     def assign_group_first_step(group)
      if !@group_first_step

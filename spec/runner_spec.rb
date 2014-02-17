@@ -210,10 +210,42 @@ describe StepMachine::Runner do
 			end
 			@runner.step(:step_3, &block)
 
-			@runner.run(:group)
+			@runner.run( :group => :group )
 
 			order.should == [:step_1, :step_2]
 		end
+
+		it "should run the steps up to given step" do
+			order = []
+			block = proc { |s| order << s.name }
+			@runner.step(:step_1, &block)
+			@runner.step(:step_2, &block)
+			@runner.step(:step_3, &block)
+			@runner.run( :upto => :step_2 )
+			order.should == [:step_1, :step_2]		  
+		end
+
+		it "should run the steps from given step" do
+			order = []
+			block = proc { |s| order << s.name }
+			@runner.step(:step_1, &block)
+			@runner.step(:step_2, &block)
+			@runner.step(:step_3, &block)
+			@runner.run( :from => :step_2 )
+			order.should == [:step_2, :step_3]
+		end
+
+		it "should run the steps from step_2 upto step_3" do
+			order = []
+			block = proc { |s| order << s.name }
+			@runner.step(:step_1, &block)
+			@runner.step(:step_2, &block)
+			@runner.step(:step_3, &block)
+			@runner.step(:step_4, &block)
+			@runner.run( :from => :step_2, :upto => :step_3 )
+			order.should == [:step_2, :step_3]
+		end
+
 	end
 
 	describe "on_step_failure" do
