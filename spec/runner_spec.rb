@@ -18,7 +18,7 @@ describe StepMachine::Runner do
 		it "should return an existing group" do
 			group = @runner.group(:group)
 
-			@runner.group(:group).should be == group			
+			expect(@runner.group(:group)).to eql(group)
 		end
 
 		it "should assign the first step defined as first step of group" do
@@ -45,6 +45,15 @@ describe StepMachine::Runner do
 			@runner.step(:step_2).group.name.should == :group_2
 			@runner.step(:step_3).group.should be_nil			
 		end
+
+		it "should assign a condition with group" do
+		  block = proc {x + 1}
+		  @runner.group(:group_1) do
+		  	@runner.step(:step_2) {}
+		  end.condition &block
+		  expect(@runner.group(:group_1).condition_block).to eql(block)
+		end
+
 	end
 
 	describe "on step" do
@@ -244,6 +253,24 @@ describe StepMachine::Runner do
 			@runner.step(:step_4, &block)
 			@runner.run( :from => :step_2, :upto => :step_3 )
 			order.should == [:step_2, :step_3]
+		end
+
+		it "should evaluate the group condition" do
+			order = []
+			block = proc { |s| order << s.name }
+			
+			@runner.step(:step_1, &block)
+			
+			@runner.group :group do
+				@runner.step(:step_2, &block)
+				@runner.step(:step_3, &block)
+			end.condition { false }
+			
+			@runner.step(:step_4, &block)
+
+			@runner.run
+			
+			expect(order).to eql([:step_1, :step_4])
 		end
 
 	end

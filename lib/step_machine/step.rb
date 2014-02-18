@@ -35,7 +35,7 @@ module StepMachine
     end
 
     def perform
-      return true if condition_block && !condition_block.call
+      return true unless condition_satisfied
       @performed = true
       @result = block.call(self)
       valid = valid?
@@ -58,6 +58,12 @@ module StepMachine
         return result.match(validation) if validation.is_a?(Regexp)
         return validation == result
       end
+      true
+    end
+
+    def condition_satisfied      
+      return false if (group && group.condition_block && !group.condition_block.call)
+      return false if (condition_block && !condition_block.call)
       true
     end
 

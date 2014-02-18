@@ -6,7 +6,7 @@ describe Step do
 		@step = Step.new(:name)
 		@step.block = proc { 1 + 1 }
 	end
-	
+
 	it "validate should assign a block validation to the step" do
 
 		block = proc {|step| step.result = 2}
@@ -89,15 +89,15 @@ describe Step do
 
 		it "should evaluate the validation block" do
 			@step.validate {|step| step.result == 1} # invalid
-			@step.perform.should be_false 
+			@step.perform.should be_false
 
 			@step.validate {|step| step.result == 2} # valid
-			@step.perform.should be_true 
+			@step.perform.should be_true
 		end
 
 		it "should evaluate the validation value" do
 			@step.validate(1) # invalid
-			@step.perform.should be_false 
+			@step.perform.should be_false
 
 			@step.validate(2) # valid
 			@step.perform.should be_true
@@ -106,23 +106,23 @@ describe Step do
 		it "should evaluate the validation regex" do
 			@step.block = proc { "validation" }
 			@step.validate(/^x/) # invalid
-			@step.perform.should be_false 
+			@step.perform.should be_false
 
 			@step.validate(/n$/) # valid
 			@step.perform.should be_true
 		end
 
 		it "should store the exception on step when raised" do
-			@step.block = proc { raise ArgumentError }			
-			@step.perform.should be_false 
+			@step.block = proc { raise ArgumentError }
+			@step.perform.should be_false
 			@step.exception.class.should == ArgumentError
 		end
 
 		it "should execute a success block" do
-			x = 0		  
+			x = 0
 			@step.success {|step| x += 1 }
 			x.should == 0
-		  @step.perform
+			@step.perform
 			x.should == 1
 		end
 
@@ -134,7 +134,7 @@ describe Step do
 			step_a.should be_performed
 		end
 
-		it "should evaluate the condition block to execute the step" do						
+		it "should evaluate the condition block to execute the step" do
 			@step.condition { true }
 			@step.perform
 			@step.should be_performed
@@ -145,6 +145,15 @@ describe Step do
 			@step.perform.should be_true
 			@step.should_not be_performed
 		end
+
+		it "should not execute the step if the group condition block is false" do
+			group = Group.new(:group_1)
+			group.condition { false }
+			@step.group = group
+			expect(@step.perform).to be_true
+			expect(@step).not_to be_performed
+		end
+
 
 	end
 
