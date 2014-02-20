@@ -460,6 +460,18 @@ describe StepMachine::Runner do
 			@runner.times_to_repeat.should == -1
 			@runner.status.should == :failure
 		end
+
+		it "it should execute failure when has errors message on step" do
+		  @runner.step(:step_1_errors){x=1}.validate {|step| step.errors << 'errors' }		
+		  x = 0
+		  @runner.on_step_failure{x += 1}
+		  @runner.on_step_failure{x += 2}
+
+		  @runner.run
+		  
+		  x.should == 3
+		end
+
 	end
 
 	describe "before each step" do

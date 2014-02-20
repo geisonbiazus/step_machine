@@ -14,6 +14,12 @@ module StepMachine
       self
     end
 
+    def errors(init_error = nil)
+      @errors = init_error unless init_error.nil?
+      @errors = [] if init_error.nil? && @errors.nil?
+      @errors
+    end
+
     def success(&block)
       @success = block
       self
@@ -54,7 +60,8 @@ module StepMachine
 
     def valid?
       if validation 
-        return validation.call(self) if validation.is_a?(Proc)
+        return (validation.call(self) && errors.empty?) if validation.is_a?(Proc)
+        return false unless errors.empty?
         return result.match(validation) if validation.is_a?(Regexp)
         return validation == result
       end
