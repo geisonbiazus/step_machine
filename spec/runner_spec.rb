@@ -472,6 +472,17 @@ describe StepMachine::Runner do
 		  x.should == 3
 		end
 
+		it "it should execute success when hasn't errors message on step" do
+		  @runner.step(:step_1_not_failed){x=1}.validate {}		
+		  x = 0
+		  @runner.on_step_failure{x += 1}
+		  @runner.on_step_failure{x += 2}
+
+		  @runner.run
+		  
+		  x.should == 0
+		end
+
 	end
 
 	describe "before each step" do

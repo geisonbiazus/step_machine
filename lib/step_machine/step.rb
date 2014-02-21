@@ -59,8 +59,8 @@ module StepMachine
     private
 
     def valid?
-      if validation 
-        return (validation.call(self) && errors.empty?) if validation.is_a?(Proc)
+      if validation
+        return (!(validation.call(self) === false) && errors.empty?) if validation.is_a?(Proc)
         return false unless errors.empty?
         return result.match(validation) if validation.is_a?(Regexp)
         return validation == result
