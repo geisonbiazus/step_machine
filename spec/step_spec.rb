@@ -62,6 +62,25 @@ describe Step do
 			expect(@step.errors).to be_a(Hash)					  
 		end
 
+		it "should not clear errors when initialized with same variable format" do
+			@step.errors("") << 'step '
+			@step.errors("") << 'has '
+			@step.errors     << 'error'
+
+			expect(@step.errors).to eql('step has error')
+			expect(@step.errors).to be_a(String)
+		end
+
+		it "should clear errors when initialized with diferent varialbe format" do
+			@step.errors([]) << 'step '
+			@step.errors("") << 'has '
+			@step.errors     << 'error'
+
+			expect(@step.errors).to eql('has error')
+			expect(@step.errors).to be_a(String)
+		end
+
+
 	end
 
 	describe "next step" do

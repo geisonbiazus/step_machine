@@ -15,8 +15,8 @@ module StepMachine
     end
 
     def errors(init_error = nil)
-      @errors = init_error unless init_error.nil?
-      @errors = [] if init_error.nil? && @errors.nil?
+      @errors = init_error if (!init_error.nil? and init_error.class != @errors.class)
+      @errors = [] if (init_error.nil? && @errors.nil?)
       @errors
     end
 
