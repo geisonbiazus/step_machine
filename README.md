@@ -49,6 +49,17 @@ or:
 	
 	step(step_1).validate('OK')
 
+## Validating steps error message
+
+	step(:step_1).validate do |step|
+		step.result == "OK"
+		step.errors << 'This is a array error message forced to false validate'
+	end
+	
+	step(step_1).errors({}) << 'This is a hash error message forced to false validate'
+
+	step(step_1).errors('') << 'This is a string error message forced to false validate'
+
 ## Callbacks
 
 	on_step_failure do |f|
