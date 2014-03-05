@@ -126,6 +126,20 @@ or:
 
 	run_steps( {:group => :group_1} ) # only the steps 1 and 2 will be performed
 
+## Group with condition
+
+	group(:group_1)
+		
+		step(:step_2) do
+			# code
+		end
+	
+	end.condition do 
+			step(:step_1).performed?
+	end
+
+	run_steps # only if was performed
+
 ## Execute from and/or upto defined step
 
 	step :step_1 { ... }
