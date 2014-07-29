@@ -6,6 +6,10 @@ step_machine is a simple gem for executing code based in steps. Each step can be
 
 Add this line to your application's Gemfile:
 
+    gem 'step_machine'
+
+    or 
+    
     gem 'step_machine', git: git@bitbucket.org:geisonbiazus/step_machine.git
 
 And then execute:
