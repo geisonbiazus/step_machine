@@ -2,8 +2,8 @@ module StepMachine
 
   class Step
 
-    attr_accessor :name, :block, :next_step, :group
-    attr_reader :exception, :result, :validation, :condition_block
+    attr_accessor :name, :block, :next_step, :group, :exception
+    attr_reader :result, :validation, :condition_block
 
     def initialize(name)
       self.name = name
