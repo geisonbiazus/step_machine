@@ -10,7 +10,7 @@ Add this line to your application's Gemfile:
 
     or 
     
-    gem 'step_machine', git: git@bitbucket.org:geisonbiazus/step_machine.git
+    gem 'step_machine', git: git@github.com:geisonbiazus/step_machine.git
 
 And then execute:
 
